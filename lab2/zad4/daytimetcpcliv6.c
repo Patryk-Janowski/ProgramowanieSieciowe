@@ -56,7 +56,7 @@ main(int argc, char **argv)
 
 	fflush(stdout);
 	fprintf(stderr,"\nOK\n");
-	fprintf(recvline);
+	fprintf(stdout, recvline);
 
 	exit(0);
 }
