@@ -16,11 +16,18 @@ main(int argc, char **argv)
 {
 	int					sockfd, n;
 	struct sockaddr_in6	servaddr;
-	char				recvline[MAXLINE + 1];
-	char nickname[100];
+	char				recvline[MAXLINE + 1], username[100];
 	int err;
 
-	if (argc != 3){
+	//czyszczenie bufora
+	memset(username, '\0', sizeof(username));
+
+	//wczytanie nazwy uzytkownika z klawiatury
+	printf("Enter your username: ");
+    fgets(username, 100, stdin);
+	username[strcspn(username, "\n")] = 0;
+
+	if (argc != 2){
 		fprintf(stderr, "ERROR: usage: a.out <IPaddress>  \n");
 		return 1;
 	}
@@ -28,9 +35,6 @@ main(int argc, char **argv)
 		fprintf(stderr,"socket error : %s\n", strerror(errno));
 		return 1;
 	}
-
-	memset(nickname, '\0', sizeof(nickname));
-	strcpy(nickname, argv[2]);
 
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin6_family = AF_INET6;
@@ -46,10 +50,9 @@ main(int argc, char **argv)
 		fprintf(stderr,"connect error : %s \n", strerror(errno));
 		return 1;
 	}
-
-	//send nickname do server
-	if(send(sockfd, nickname, strlen(nickname), 0) < 0){
-        printf("unable to send nickname\n");
+	//wyslanie nazwy uzytkownika do serwera
+	if(send(sockfd, username, strlen(username), 0) < 0){
+        printf("unable to send username\n");
         return 1;
     }
 

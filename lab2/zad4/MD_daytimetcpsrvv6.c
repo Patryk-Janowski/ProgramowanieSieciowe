@@ -25,17 +25,16 @@ main(int argc, char **argv)
 {
 	int				listenfd, connfd;
 	socklen_t			len;
-	char				buff[MAXLINE], str[INET6_ADDRSTRLEN+1];
-	char nickname[100];
+	char				buff[MAXLINE], str[INET6_ADDRSTRLEN+1], client_username[100];
 	time_t				ticks;
 	struct sockaddr_in6	servaddr, cliaddr;
+
+	memset(client_username, '\0', sizeof(client_username));
 
         if ( (listenfd = socket(AF_INET6, SOCK_STREAM, 0)) < 0){
                 fprintf(stderr,"socket error : %s\n", strerror(errno));
                 return 1;
         }
-	
-	memset(nickname, '\0', sizeof(nickname));
 
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin6_family = AF_INET6;
@@ -49,16 +48,16 @@ main(int argc, char **argv)
 	}
 	servaddr.sin6_port   = htons(13);	/* daytime server */
 
-	if ( bind( listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0){
-			fprintf(stderr,"bind error : %s\n", strerror(errno));
-			return 1;
-	}
+        if ( bind( listenfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0){
+                fprintf(stderr,"bind error : %s\n", strerror(errno));
+                return 1;
+        }
 
 
-	if ( listen(listenfd, LISTENQ) < 0){
-			fprintf(stderr,"listen error : %s\n", strerror(errno));
-			return 1;
-	}
+        if ( listen(listenfd, LISTENQ) < 0){
+                fprintf(stderr,"listen error : %s\n", strerror(errno));
+                return 1;
+        }
 
 	fprintf(stderr,"Waiting for clients ... \n");
 	for ( ; ; ) {
@@ -67,16 +66,17 @@ main(int argc, char **argv)
                 	fprintf(stderr,"accept error : %s\n", strerror(errno));
                 	continue;
         	}
-
-		//Receive nickname from client
-		if (recv(connfd, nickname, sizeof(nickname), 0) < 0){
+		//odebranie nazwy uzytkownika klienta
+		if (recv(connfd, client_username, sizeof(client_username), 0) < 0){
 			printf("receive error\n");
 			return -1;
 		}
 
 		bzero(str, sizeof(str));
 	   	inet_ntop(AF_INET6, (struct sockaddr  *) &cliaddr.sin6_addr,  str, sizeof(str));
-		printf("Connection from %s - nickname: %s \n", str, nickname);
+		//nazwa uzytkownika obok adresu klienta, czyszczenie bufora
+		printf("Connection from %s (%s)\n", str ,client_username);
+		memset(client_username, '\0', sizeof(client_username));
 
         	ticks = time(NULL);
         	snprintf(buff, sizeof(buff), "%.24s\r\n", ctime(&ticks));
