@@ -75,7 +75,7 @@ main(int argc, char **argv)
     sigemptyset (&new_action.sa_mask);
     new_action.sa_flags = 0;
 
-    if( sigaction (SIGCHLD, &new_action, &old_action) < 0 ){
+    if( sigaction (SIGPIPE, &new_action, &old_action) < 0 ){
           fprintf(stderr,"sigaction error : %s\n", strerror(errno));
           return 1;
     }
