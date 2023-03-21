@@ -24,16 +24,6 @@
 
 #define LISTENQ 2
 
-void
-sig_pipe(int signo)
-{
-	pid_t	pid;
-	int		stat;
-
-	while ( (pid = waitpid(-1, &stat, WNOHANG)) > 0)
-		printf("child %d send SIGPIPE\n", pid);
-	return;
-}
 
 int
 main(int argc, char **argv)
@@ -46,6 +36,7 @@ main(int argc, char **argv)
         int  mss,i,len;
         int bufsize=2000;
         struct timeval start, stop;
+        int errnum;
 
 
         if ( (listenfd = socket(AF_INET6, SOCK_STREAM, 0)) < 0){
@@ -65,22 +56,7 @@ main(int argc, char **argv)
 	}
 	servaddr.sin6_port   = htons(PORT_NR);	/* daytime server */
 
-#define SIGPIPE_
-#ifdef SIGPIPE_
-    struct sigaction new_action, old_action;
-
-  /* Set up the structure to specify the new action. */
-    new_action.sa_handler = sig_pipe;
-  //  new_action.sa_handler = SIG_IGN;
-    sigemptyset (&new_action.sa_mask);
-    new_action.sa_flags = 0;
-
-    if( sigaction (SIGPIPE, &new_action, &old_action) < 0 ){
-          fprintf(stderr,"sigaction error : %s\n", strerror(errno));
-          return 1;
-    }
- 
-#endif 
+signal(SIGPIPE, SIG_IGN);
 
 #ifdef SO_REUSEADDR	
         sndbuf = 1;               
@@ -188,6 +164,11 @@ main(int argc, char **argv)
         	     if( write(connfd, buff, MAXLINE)< 0 )
                 	fprintf(stderr,"write error : %s\n", strerror(errno));
                      gettimeofday(&stop,0);
+                     errnum = errno;
+                     if (errno == EPIPE){
+                        errno = 0;
+                        break;
+                     }
                      if( (stop.tv_sec - start.tv_sec) > 5 )
                         break;
                 }

@@ -88,7 +88,7 @@ main(int argc, char **argv)
 	socklen_t			clilen;
 	struct sockaddr_in6	cliaddr, servaddr;
 	void				sig_chld(int);
-#define SIGCHLD_
+//#define SIGCHLD_
 #ifdef SIGCHLD_
     struct sigaction new_action, old_action;
 
@@ -105,7 +105,7 @@ main(int argc, char **argv)
  
 #endif 
 //	signal(SIGCHLD, sig_chld);
-// signal(SIGCHLD, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
 	
    if ( (listenfd = socket(AF_INET6, SOCK_STREAM, 0)) < 0){
           fprintf(stderr,"socket error : %s\n", strerror(errno));
