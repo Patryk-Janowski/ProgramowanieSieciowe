@@ -19,21 +19,9 @@
 
 #define M_ALARM
 #ifdef M_ALARM
-
-struct sockaddr	*preply_addr;
-struct sockaddr_in6	servaddr;
-char sendline[MAXLINE];
-int sockfd;
-
 void sig_alarm(int signo)
 {
-    printf("Received SIGALARM = %d\n", signo);
-	alarm(3);
-	if( sendto(sockfd, sendline, 0, 0, (SA *) &servaddr, sizeof(servaddr)) <0 ){
-			perror("sendto error");
-			free(preply_addr);
-			exit(1);
-	}
+   printf("Received SIGALARM = %d\n", signo);
 }
 
 int m_signal(int signum, void handler(int)){
@@ -42,7 +30,7 @@ int m_signal(int signum, void handler(int)){
   /* Set up the structure to specify the new action. */
     new_action.sa_handler = handler;
     sigemptyset (&new_action.sa_mask);
-    new_action.sa_flags = SA_RESTART;
+    new_action.sa_flags = 0;
 
     if( sigaction (signum, &new_action, &old_action) < 0 ){
           fprintf(stderr,"sigaction error : %s\n", strerror(errno));
@@ -56,8 +44,9 @@ int
 dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen)
 {
 	int		n, i;
-	char		recvline[MAXLINE + 1];
+	char		sendline[MAXLINE], recvline[MAXLINE + 1];
 	socklen_t	len;
+	struct sockaddr	*preply_addr;
 	char		str[INET6_ADDRSTRLEN+1];
 	struct sockaddr_in6*	 cliaddr;
 	struct sockaddr_in*	 cliaddrv4;
@@ -84,28 +73,32 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen)
 #endif
 
 	len = servlen;
+	for(i=0; i < 3 ; i++ ){
 
-	if( sendto(sockfd, sendline, 0, 0, pservaddr, servlen) <0 ){
-		perror("sendto error");
-		free(preply_addr);
-		exit(1);
-	}
+		if( sendto(sockfd, sendline, 0, 0, pservaddr, servlen) <0 ){
+			perror("sendto error");
+			free(preply_addr);
+			exit(1);
+		}
 #ifdef M_ALARM
-	alarm(3);
+		alarm(3);
 #endif
 
-	if( (n = recvfrom(sockfd, recvline, MAXLINE, 0, preply_addr, &len) ) < 0 ){
-		printf("errno = %d\n", errno);
-		perror("recfrom error");
-		if(!( ((errno == EAGAIN) || (errno ==  EINTR)) && (i < 2) ));
-		{
-			free(preply_addr);
-			return(1);
-		}
-	}else
+		if( (n = recvfrom(sockfd, recvline, MAXLINE, 0, preply_addr, &len) ) < 0 ){
+			printf("errno = %d\n", errno);
+			perror("recfrom error");
+			if( ((errno == EAGAIN) || (errno ==  EINTR)) && (i < 2) )
+				continue;
+			else{
+				free(preply_addr);
+				return(1);
+			}
+		}else
 #ifdef M_ALARM
 		        alarm(0);
 #endif
+			break;
+	}
 
 	bzero(str, sizeof(str));
 
@@ -165,9 +158,11 @@ dt_cli_connect(int sockfd, const SA *pservaddr, socklen_t servlen)
 	}
 }
 
-int main(int argc, char **argv){
-
-	int					n, delay;
+	int
+main(int argc, char **argv)
+{
+	int					sockfd, n, delay;
+	struct sockaddr_in6	servaddr;
 	char				recvline[MAXLINE + 1];
 
 	if (argc != 2){
