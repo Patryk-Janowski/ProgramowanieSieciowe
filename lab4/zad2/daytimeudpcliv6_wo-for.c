@@ -20,10 +20,10 @@
 #define M_ALARM
 #ifdef M_ALARM
 
-int sockfd;
 struct sockaddr	*preply_addr;
 struct sockaddr_in6	servaddr;
 char sendline[MAXLINE];
+int sockfd;
 
 void sig_alarm(int signo)
 {
@@ -35,8 +35,6 @@ void sig_alarm(int signo)
 			exit(1);
 	}
 }
-
-
 
 int m_signal(int signum, void handler(int)){
     struct sigaction new_action, old_action;
@@ -74,7 +72,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen)
 
 #ifndef M_ALARM
 
-	delay.tv_sec = 3;  //opóŸnienie na gnieŸdzie
+	delay.tv_sec = 3;  //opï¿½nienie na gnieï¿½dzie
 	delay.tv_usec = 1; 
 	len = sizeof(delay);
 	if( setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &delay, len) == -1 ){
@@ -86,7 +84,6 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen)
 #endif
 
 	len = servlen;
-
 
 	if( sendto(sockfd, sendline, 0, 0, pservaddr, servlen) <0 ){
 		perror("sendto error");
@@ -100,8 +97,8 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen)
 	if( (n = recvfrom(sockfd, recvline, MAXLINE, 0, preply_addr, &len) ) < 0 ){
 		printf("errno = %d\n", errno);
 		perror("recfrom error");
-		if( ((errno == EAGAIN) || (errno ==  EINTR)) && (i < 2) );
-		else{
+		if(!( ((errno == EAGAIN) || (errno ==  EINTR)) && (i < 2) ));
+		{
 			free(preply_addr);
 			return(1);
 		}

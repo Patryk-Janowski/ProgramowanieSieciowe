@@ -65,3 +65,71 @@ dt_cli_connect(int sockfd, const SA *pservaddr, socklen_t servlen)
 Na odbieranie asynhcoroncizyncyh bledow błędy ICMP przez gniazdo UDP pozwala zastowowanei funkcji setsockopt() z argumentem IP_RECVERR
 
 # Zad2 
+
+## Dzialanie programu z odkomentowana linia 20
+
+<img src="zad2/zad2-1.png"  style="width:1000px">
+
+## Zmiany w kodzie
+
+**gniazdo i inne zmienne globalne**
+
+```c
+#define MAXLINE 1024
+#define SA      struct sockaddr
+
+#define M_ALARM
+#ifdef M_ALARM
+
+struct sockaddr	*preply_addr;
+struct sockaddr_in6	servaddr;
+char sendline[MAXLINE];
+int sockfd;
+
+```
+
+
+**Funkcaj sigalarm oraz dodanie lagi SA_RESTART**
+
+```c
+void sig_alarm(int signo)
+{
+    printf("Received SIGALARM = %d\n", signo);
+	alarm(3);
+	if( sendto(sockfd, sendline, 0, 0, (SA *) &servaddr, sizeof(servaddr)) <0 ){
+			perror("sendto error");
+			free(preply_addr);
+			exit(1);
+	}
+}
+
+int m_signal(int signum, void handler(int)){
+    struct sigaction new_action, old_action;
+
+  /* Set up the structure to specify the new action. */
+    new_action.sa_handler = handler;
+    sigemptyset (&new_action.sa_mask);
+    new_action.sa_flags = SA_RESTART;
+    ...
+}
+```
+
+Usuniecie petli for oraz przypisanie fukcji sig_alarm jako handlera sygnalu SIGALARM
+
+```c
+    m_signal(SIGALRM, sig_alarm);
+...
+
+	len = servlen;
+
+	if( sendto(sockfd, sendline, 0, 0, pservaddr, servlen) <0 ){
+		perror("sendto error");
+		free(preply_addr);
+		exit(1);
+	}
+#ifdef M_ALARM
+	alarm(3);
+#endif
+```
+
+## Dzialanei programu 
