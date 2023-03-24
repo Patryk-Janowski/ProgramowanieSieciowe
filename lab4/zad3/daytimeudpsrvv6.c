@@ -92,7 +92,7 @@ main(int argc, char **argv)
 
 	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
 	int yes = 1;
-	if( setsockopt(sockfd, IPPROTO_IPV6, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 		return -1;
 	}
