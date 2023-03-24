@@ -142,7 +142,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 			}
 		}
 		if (cmptr == NULL) {
-            printf(stderr, "Error: IP_TTL not enabled or small buffer or I/O error */");
+            printf(stderr, "Error: IP_TTL not enabled or small buffer or I/O error");
            }
 	}
 
