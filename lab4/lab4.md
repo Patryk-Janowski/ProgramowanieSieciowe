@@ -151,43 +151,29 @@ TTL = strtol(argv[1], NULL, 10);
 
 // Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
 int yes = 1;
-if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+if( setsockopt(sockfd, IPPROTO_IPV6, IP_RECVTTL, &yes, sizeof(yes)) < 0){
     fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
     return -1;
 }
+
+	// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
+	if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
+		fprintf(stderr, "IPV6_UNICAST_HOPS error\n");
+		return 1;
+	}
 ```
 
 ## Odbeiranie pola TTL w kliencie
 
 ```c
 // Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
-int yes = 1;
-if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
-    fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-    return -1;
-}
+(cmptr->cmsg_level == IPPROTO_IPV6 &&
+			cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
+			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
+			printf("TTL set to: %d\n", TTL);
+        
 ... 
 
 
 ``` 
 
-
-
- struct msghdr msgh;
-           struct cmsghdr *cmsg;
-           int received_ttl;
-
-           /* Receive auxiliary data in msgh */
-
-           for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL;
-                   cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
-               if (cmsg->cmsg_level == IPPROTO_IP
-                       && cmsg->cmsg_type == IP_TTL) {
-                   memcpy(&receive_ttl, CMSG_DATA(cmsg), sizeof(received_ttl));
-                   break;
-               }
-           }
-
-           if (cmsg == NULL) {
-               /* Error: IP_TTL not enabled or small buffer or I/O error */
-           }

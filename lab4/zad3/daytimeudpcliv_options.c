@@ -67,7 +67,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 
 	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
 	int yes = 1;
-	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+	if( setsockopt(sockfd, IPPROTO_IPV6, IP_RECVTTL, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 		return -1;
 	}
@@ -158,7 +158,6 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 		printf("\nUnknown ancillary data, len = %d, level = %d, type = %d\n",
 			(int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
 			}
-		printf("TTL set to: %d\n", TTL);
 		}
 		return 1;
 }
