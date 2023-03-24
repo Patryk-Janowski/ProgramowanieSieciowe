@@ -51,7 +51,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 
 	union {
 	  struct cmsghdr	cm;
-	  char				control[CMSG_SPACE(sizeof(struct in6_pktinfo))];
+	  char				control[CMSG_SPACE(sizeof(struct in6_pktinfo) + 16)];
 	} control_un;
 
 	pdstaddrv4 = (struct sockaddr_in *) src_addr;
