@@ -158,6 +158,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 		printf("\nUnknown ancillary data, len = %d, level = %d, type = %d\n",
 			(int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
 			}
+		printf("TTL set to: %d\n", TTL);
 		}
 		return 1;
 }
