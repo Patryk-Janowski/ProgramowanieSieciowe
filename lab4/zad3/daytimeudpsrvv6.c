@@ -78,7 +78,8 @@ main(int argc, char **argv)
 	struct sockaddr_in6	servaddr, cliaddr;
 
 	if (argc != 2){
-		fprintf(stderr,"usage: %s <TTL>\n", argv[1]);
+		fprintf(stderr,"usage: %s <TTL>\n", argv[0]);
+		return 1;
 	}
 
 	TTL = strtol(argv[1], NULL, 10);
