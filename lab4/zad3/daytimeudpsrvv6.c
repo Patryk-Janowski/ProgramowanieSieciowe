@@ -71,7 +71,8 @@ dg_echo(int sockfd, SA *pcliaddr, socklen_t clilen)
 int
 main(int argc, char **argv)
 {
-	int				sockfd, connfd, TTL, HOP_COUNT;
+	int				sockfd, connfd;
+	long 				TTL;
 	socklen_t			len;
 	char				buff[MAXLINE], str[INET6_ADDRSTRLEN+1];
 	time_t				ticks;
