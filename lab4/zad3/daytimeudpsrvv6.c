@@ -91,7 +91,8 @@ main(int argc, char **argv)
 	}
 
 	// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
-	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &TTL, sizeof(TTL)) < 0){
+	int yes = 1;
+	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 		return 1;
 	}

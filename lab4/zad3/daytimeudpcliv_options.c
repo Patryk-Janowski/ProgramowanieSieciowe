@@ -51,7 +51,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 
 	union {
 	  struct cmsghdr	cm;
-	  char				control[CMSG_SPACE(sizeof(struct in6_pktinfo) + 16)];
+	  char				control[CMSG_SPACE(sizeof(struct in6_pktinfo))];
 	} control_un;
 
 	pdstaddrv4 = (struct sockaddr_in *) src_addr;
@@ -63,6 +63,13 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 	if( setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &delay, len) == -1 ){
 		fprintf(stderr,"SO_RCVTIMEO setsockopt error : %s\n", strerror(errno));
 		return -1;
+	}
+
+	// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+	int yes = 1;
+	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+		return 1;
 	}
 
 	
