@@ -65,11 +65,11 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 		return -1;
 	}
 
-	// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
 	int yes = 1;
 	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return 1;
+		return -1;
 	}
 
 	
@@ -133,33 +133,17 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 	for (cmptr = CMSG_FIRSTHDR(&msg); cmptr != NULL;
 		 cmptr = CMSG_NXTHDR(&msg, cmptr)) {
 
-		TTL = *CMSG_DATA(cmptr);
-		printf("TTL set to: %d\n", TTL);
-
 		if( preply_addr->sa_family == AF_INET ){
 			if (cmptr->cmsg_level == IPPROTO_IP &&
-				cmptr->cmsg_type == IP_PKTINFO) {
-
-				memcpy(&pktinfov4, CMSG_DATA(cmptr),
-					   sizeof(struct in_pktinfo));
-				memcpy(&(pdstaddrv4->sin_addr), &pktinfov4.ipi_addr, sizeof(struct in_addr));
-				pdstaddrv4->sin_family = AF_INET;
-
-				continue;
-			}
-		}else{
-			if (cmptr->cmsg_level == IPPROTO_IPV6 &&
-				cmptr->cmsg_type == IPV6_PKTINFO) {
-
-				memcpy(&pktinfov6, CMSG_DATA(cmptr),
-					   sizeof(struct in6_pktinfo));
-				memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
-				pdstaddrv6->sin6_family = AF_INET6;
-				continue;
+				cmptr->cmsg_type == IP_TTL) {
+				memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
+				printf("TTL set to: %d\n", TTL);
+				break;
 			}
 		}
-		printf("\nUnknown ancillary data, len = %d, level = %d, type = %d\n",
-				 (int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
+		if (cmptr == NULL) {
+            printf(stderr, "Error: IP_TTL not enabled or small buffer or I/O error */");
+           }
 	}
 
 

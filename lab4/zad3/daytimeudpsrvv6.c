@@ -90,11 +90,11 @@ main(int argc, char **argv)
 			return 1;
 	}
 
-	// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
 	int yes = 1;
 	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return 1;
+		return -1;
 	}
 
 	// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP

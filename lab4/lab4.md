@@ -149,19 +149,45 @@ int m_signal(int signum, void handler(int)){
 ```c
 TTL = strtol(argv[1], NULL, 10);
 
-// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
-if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &TTL, sizeof(TTL)) < -1){
+// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+int yes = 1;
+if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
     fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-    return 1;
+    return -1;
 }
 ```
 
 ## Odbeiranie pola TTL w kliencie
 
 ```c
-TTL = *CMSG_DATA(cmptr);
-printf("TTL set to: %d\n", TTL);
+// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+int yes = 1;
+if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+    fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+    return -1;
+}
+... 
+
+
 ``` 
 
 
 
+ struct msghdr msgh;
+           struct cmsghdr *cmsg;
+           int received_ttl;
+
+           /* Receive auxiliary data in msgh */
+
+           for (cmsg = CMSG_FIRSTHDR(&msgh); cmsg != NULL;
+                   cmsg = CMSG_NXTHDR(&msgh, cmsg)) {
+               if (cmsg->cmsg_level == IPPROTO_IP
+                       && cmsg->cmsg_type == IP_TTL) {
+                   memcpy(&receive_ttl, CMSG_DATA(cmsg), sizeof(received_ttl));
+                   break;
+               }
+           }
+
+           if (cmsg == NULL) {
+               /* Error: IP_TTL not enabled or small buffer or I/O error */
+           }
