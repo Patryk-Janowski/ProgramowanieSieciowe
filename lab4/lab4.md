@@ -2,7 +2,7 @@
 
 # Zad 1
 
-## Nawiazanie polaczenia:
+## Nawiązanie połączenia:
 
 <img src="zad1/zad1-3/zad1-3.png"  style="width:1000px">
 
@@ -12,15 +12,15 @@
 
 <img src="zad1/zad1-4-5/no-conn/zad1-4-no-conn.png"  style="width:1000px">
 
-**W przypadku wylaczonego serwera**
+**W przypadku wyłączonego serwera**
 
 <img src="zad1/zad1-4-5/no-conn/zad1-4-no-conn-1.png"  style="width:1000px">
 
-errno=11 pojawia sie po wywolaniu recfrom() na zamkniętym gnziedzie przy ustawionej opcji SO_RECVTIMEO
+errno=11 pojawia sie po wywołaniu recfrom() na zamkniętym gnieździe przy ustawionej opcji SO_RECVTIMEO
 
 <img src="zad1/zad1-4-5/no-conn/zad1-4-no-conn-2.png"  style="width:1000px">
 
-Komunikaty sa spowodowane ustawioan opcją SO_RECVTIMEO w gniezdzie 
+Komunikaty sa spowodowane ustawioną opcją SO_RECVTIMEO w gnieździe 
 
 ## Z funkcja dt_cli_connect
 
@@ -34,11 +34,11 @@ Komunikaty sa spowodowane ustawioan opcją SO_RECVTIMEO w gniezdzie
 
 <img src="zad1/zad1-4-5/conn/zad1-4-conn-1.png"  style="width:1000px">
 
-komunikaty sa wysylane przez protokol ICMPv6
+Komunikaty są wysyłane przez protokół ICMPv6
 
 ## Dodanie zabezpieczenia do funkcji dt_cli_connect
 
-poczatek funkcji dt_cli_connect
+Początek funkcji dt_cli_connect
 
 ```c
 dt_cli_connect(int sockfd, const SA *pservaddr, socklen_t servlen)
@@ -56,6 +56,8 @@ dt_cli_connect(int sockfd, const SA *pservaddr, socklen_t servlen)
 		fprintf(stderr,"SO_RCVTIMEO setsockopt error : %s\n", strerror(errno));
 		exit(1);
 	}
+    ...
+}
 ```
 
 ## Teraz klient ponawia polaczenie
@@ -67,6 +69,8 @@ Na odbieranie asynhcoroncizyncyh bledow błędy ICMP przez gniazdo UDP pozwala z
 # Zad2 
 
 ## Dzialanie programu z odkomentowana linia 20
+
+W odróżnieniu od wersji podstawowej m tutaj nie występuje errno 13 przy wywołaniu recfrom() orzy ustawionym timeout, tylko po 3 sekundach wysyłany jest sygnał SIGALARM, który następnie obsługiwany jest przez funkcje sig_alarm() - wyświetla tylko pojawienie sie alarmu, a następnie przez brak ustawionej flagi SA_RESTART w obsłudze sygnału proces czytania z gniazda zostaje przerwany (errno 4).
 
 <img src="zad2/zad2-1.png"  style="width:1000px">
 
@@ -85,9 +89,9 @@ struct sockaddr	*preply_addr;
 struct sockaddr_in6	servaddr;
 char sendline[MAXLINE];
 int sockfd;
+...
 
 ```
-
 
 **Funkcaj sigalarm oraz dodanie lagi SA_RESTART**
 
@@ -114,11 +118,11 @@ int m_signal(int signum, void handler(int)){
 }
 ```
 
-Usuniecie petli for oraz przypisanie fukcji sig_alarm jako handlera sygnalu SIGALARM
+**Usuniecie pętli for oraz przypisanie funkcji sig_alarm jako handlera sygnału SIGALARM**
 
 ```c
     m_signal(SIGALRM, sig_alarm);
-...
+    ...
 
 	len = servlen;
 
@@ -132,4 +136,18 @@ Usuniecie petli for oraz przypisanie fukcji sig_alarm jako handlera sygnalu SIGA
 #endif
 ```
 
-## Dzialanei programu 
+## Działanie programu bez pętli for
+
+<img src="zad2/zad2-2.png"  style="width:1000px">
+
+
+# Zad 3
+
+```c
+	// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &TTL, sizeof(TTL)) == -1){
+		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+		return -1;
+	}
+```
+

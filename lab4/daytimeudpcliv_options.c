@@ -27,7 +27,7 @@ int
 dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*preply_addr, 
 		socklen_t *t, char *recvline, int *data_len, struct sockaddr *src_addr)
 {
-	int				n, i;
+	int				n, i, TTL;
 	char			sendline[MAXLINE]; 
 	
 	socklen_t		len;
@@ -125,6 +125,16 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 
 	for (cmptr = CMSG_FIRSTHDR(&msg); cmptr != NULL;
 		 cmptr = CMSG_NXTHDR(&msg, cmptr)) {
+
+		TTL = *CMSG_DATA(cmptr);
+
+			// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+		if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &TTL, sizeof(TTL)) == -1){
+			fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+			return -1;
+		}else {
+			printf("TTL set to: %d\n", TTL);
+		}
 
 		if( preply_addr->sa_family == AF_INET ){
 			if (cmptr->cmsg_level == IPPROTO_IP &&
