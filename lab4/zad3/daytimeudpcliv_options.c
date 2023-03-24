@@ -160,7 +160,9 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 			if (cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
 			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
 			printf("TTL set to: %d\n", TTL);
+			continue;
 			}
+		}
 
 		printf("\nUnknown ancillary data, len = %d, level = %d, type = %d\n",
 				 (int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
