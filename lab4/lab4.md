@@ -150,11 +150,13 @@ int m_signal(int signum, void handler(int)){
 TTL = strtol(argv[1], NULL, 10);
 
 // Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
-int yes = 1;
-if( setsockopt(sockfd, IPPROTO_IPV6, IP_RECVTTL, &yes, sizeof(yes)) < 0){
-    fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-    return -1;
-}
+	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+	int yes = 1;
+	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
+		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+		return -1;
+	}
+
 
 	// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
 	if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
