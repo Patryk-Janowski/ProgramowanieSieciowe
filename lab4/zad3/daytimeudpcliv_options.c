@@ -142,31 +142,28 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 					   sizeof(struct in_pktinfo));
 				memcpy(&(pdstaddrv4->sin_addr), &pktinfov4.ipi_addr, sizeof(struct in_addr));
 				pdstaddrv4->sin_family = AF_INET;
-
-				continue;
 			}
-		}else{
-			if (cmptr->cmsg_level == IPPROTO_IPV6 &&
-				cmptr->cmsg_type == IPV6_PKTINFO) {
+		}elif ((cmptr->cmsg_level == IPPROTO_IPV6 &&
+		cmptr->cmsg_type == IPV6_PKTINFO) ){
 
-				memcpy(&pktinfov6, CMSG_DATA(cmptr),
-					   sizeof(struct in6_pktinfo));
-				memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
-				memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
-				pdstaddrv6->sin6_family = AF_INET6;
-				continue;
-			}
-
-			if (cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
+		memcpy(&pktinfov6, CMSG_DATA(cmptr),
+				sizeof(struct in6_pktinfo));
+		memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
+		memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
+		pdstaddrv6->sin6_family = AF_INET6;
+		} elif (cmptr->cmsg_level == IPPROTO_IPV6 &&
+			cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
 			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
 			printf("TTL set to: %d\n", TTL);
-			continue;
-			}
-		}
-
+		} else{
 		printf("\nUnknown ancillary data, len = %d, level = %d, type = %d\n",
-				 (int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
-	}
+			(int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
+			}
+	
+		}
+}
+
+		
 
 	// for (cmptr = CMSG_FIRSTHDR(&msg); cmptr != NULL;
 	// 	 cmptr = CMSG_NXTHDR(&msg, cmptr)) {
