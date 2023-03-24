@@ -166,14 +166,14 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 		if (cmptr->cmsg_level == IPPROTO_IPV6 &&
 			cmptr->cmsg_type == IP_TTL) {
 			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
-			printf(stderr, "TTL set to: %d\n", TTL);
+			printf("TTL set to: %d\n", TTL);
 			break;
 		}
 		if (cmptr == NULL) {
             printf(stderr, "Error: IP_TTL not enabled or small buffer or I/O error");
            }
-		printf(stderr, "TTL set to: %d\n", TTL);
 	}
+	printf("TTL set to: %d\n", TTL);
 
 	return 1;
 }
