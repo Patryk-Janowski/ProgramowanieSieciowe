@@ -157,12 +157,11 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 				continue;
 			}
 
-			if (cmptr->cmsg_level == IPPROTO_IPV6 &&
-			cmptr->cmsg_type == IPV6_TTL) {
+			if (cmptr->cmsg_type == IPV6_UNICASTHOPS) {
 			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
 			printf("TTL set to: %d\n", TTL);
 			}
-			
+
 		printf("\nUnknown ancillary data, len = %d, level = %d, type = %d\n",
 				 (int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
 	}
