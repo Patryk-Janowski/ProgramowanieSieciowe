@@ -143,11 +143,25 @@ int m_signal(int signum, void handler(int)){
 
 # Zad 3
 
+
+## ustawanie TTL w serwerze
+
 ```c
-	// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
-	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &TTL, sizeof(TTL)) == -1){
-		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return -1;
-	}
+TTL = strtol(argv[1], NULL, 10);
+
+// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
+if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &TTL, sizeof(TTL)) < -1){
+    fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+    return 1;
+}
 ```
+
+## Odbeiranie pola TTL w kliencie
+
+```c
+TTL = *CMSG_DATA(cmptr);
+printf("TTL set to: %d\n", TTL);
+``` 
+
+
 
