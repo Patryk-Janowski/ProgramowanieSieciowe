@@ -157,7 +157,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 				continue;
 			}
 
-			if (cmptr->cmsg_type == IPV6_UNICASTHOPS) {
+			if (cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
 			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
 			printf("TTL set to: %d\n", TTL);
 			}
