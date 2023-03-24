@@ -143,9 +143,8 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 				memcpy(&(pdstaddrv4->sin_addr), &pktinfov4.ipi_addr, sizeof(struct in_addr));
 				pdstaddrv4->sin_family = AF_INET;
 			}
-		}elif ((cmptr->cmsg_level == IPPROTO_IPV6 &&
-		cmptr->cmsg_type == IPV6_PKTINFO) ){
-
+		}elif (cmptr->cmsg_level == IPPROTO_IPV6 &&
+		cmptr->cmsg_type == IPV6_PKTINFO) {
 		memcpy(&pktinfov6, CMSG_DATA(cmptr),
 				sizeof(struct in6_pktinfo));
 		memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
