@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lab 4</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="lab-4">Lab 4</h1>
+<h1 id="zad-1">Zad 1</h1>
+<h2 id="nawiązanie-połączenia">Nawiązanie połączenia:</h2>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-3/zad1-3.png"  style="width:1000px">
+<h2 id="z-funkcja-dt_cli">Z funkcja dt_cli</h2>
+<p><strong>Stany gniazd</strong></p>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-4-5/no-conn/zad1-4-no-conn.png"  style="width:1000px">
+<p><strong>W przypadku wyłączonego serwera</strong></p>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-4-5/no-conn/zad1-4-no-conn-1.png"  style="width:1000px">
+<p>errno=11 pojawia sie po wywołaniu recfrom() na zamkniętym gnieździe przy ustawionej opcji SO_RECVTIMEO</p>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-4-5/no-conn/zad1-4-no-conn-2.png"  style="width:1000px">
+<p>Komunikaty sa spowodowane ustawioną opcją SO_RECVTIMEO w gnieździe</p>
+<h2 id="z-funkcja-dt_cli_connect">Z funkcja dt_cli_connect</h2>
+<p><strong>Stany gniazd</strong></p>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-4-5/conn/zad1-4-conn.png"  style="width:1000px">
+<p><strong>W przypadku wylaczonego serwera</strong></p>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-4-5/conn/zad1-4-conn-2.png"  style="width:1000px">
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-4-5/conn/zad1-4-conn-1.png"  style="width:1000px">
+<p>Komunikaty są wysyłane przez protokół ICMPv6</p>
+<h2 id="dodanie-zabezpieczenia-do-funkcji-dt_cli_connect">Dodanie zabezpieczenia do funkcji dt_cli_connect</h2>
+<p>Początek funkcji dt_cli_connect</p>
+<pre><code class="language-c">dt_cli_connect(<span class="hljs-type">int</span> sockfd, <span class="hljs-type">const</span> SA *pservaddr, <span class="hljs-type">socklen_t</span> servlen)
+{
+	<span class="hljs-type">int</span>		n;
+	<span class="hljs-type">char</span>	sendline[MAXLINE], recvline[MAXLINE + <span class="hljs-number">1</span>];
+	<span class="hljs-type">char</span>		str[INET6_ADDRSTRLEN+<span class="hljs-number">1</span>];
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">timeval</span> <span class="hljs-title">delay</span>;</span>
+	<span class="hljs-type">socklen_t</span>	len;
+
+	delay.tv_sec = <span class="hljs-number">3</span>;  <span class="hljs-comment">//op�nienie na gnie�dzie</span>
+	delay.tv_usec = <span class="hljs-number">1</span>; 
+	len = <span class="hljs-keyword">sizeof</span>(delay);
+	<span class="hljs-keyword">if</span>( setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &amp;delay, len) == <span class="hljs-number">-1</span> ){
+		<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>,<span class="hljs-string">&quot;SO_RCVTIMEO setsockopt error : %s\n&quot;</span>, strerror(errno));
+		<span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);
+	}
+    ...
+}
+</code></pre>
+<h2 id="teraz-klient-ponawia-polaczenie">Teraz klient ponawia polaczenie</h2>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad1/zad1-6/zad1-6-2.png"  style="width:1000px">
+<p>Na odbieranie asynhcoroncizyncyh bledow błędy ICMP przez gniazdo UDP pozwala zastowowanei funkcji setsockopt() z argumentem IP_RECVERR</p>
+<h1 id="zad2">Zad2</h1>
+<h2 id="dzialanie-programu-z-odkomentowana-linia-20">Dzialanie programu z odkomentowana linia 20</h2>
+<p>W odróżnieniu od wersji podstawowej m tutaj nie występuje errno 13 przy wywołaniu recfrom() orzy ustawionym timeout, tylko po 3 sekundach wysyłany jest sygnał SIGALARM, który następnie obsługiwany jest przez funkcje sig_alarm() - wyświetla tylko pojawienie sie alarmu, a następnie przez brak ustawionej flagi SA_RESTART w obsłudze sygnału proces czytania z gniazda zostaje przerwany (errno 4).</p>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad2/zad2-1.png"  style="width:1000px">
+<h2 id="zmiany-w-kodzie">Zmiany w kodzie</h2>
+<p><strong>gniazdo i inne zmienne globalne</strong></p>
+<pre><code class="language-c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXLINE 1024</span>
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> SA      struct sockaddr</span>
+
+<span class="hljs-meta">#<span class="hljs-keyword">define</span> M_ALARM</span>
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> M_ALARM</span>
+
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sockaddr</span>	*<span class="hljs-title">preply_addr</span>;</span>
+<span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sockaddr_in6</span>	<span class="hljs-title">servaddr</span>;</span>
+<span class="hljs-type">char</span> sendline[MAXLINE];
+<span class="hljs-type">int</span> sockfd;
+...
+
+</code></pre>
+<p><strong>Funkcaj sigalarm oraz dodanie lagi SA_RESTART</strong></p>
+<pre><code class="language-c"><span class="hljs-type">void</span> <span class="hljs-title function_">sig_alarm</span><span class="hljs-params">(<span class="hljs-type">int</span> signo)</span>
+{
+    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Received SIGALARM = %d\n&quot;</span>, signo);
+	alarm(<span class="hljs-number">3</span>);
+	<span class="hljs-keyword">if</span>( sendto(sockfd, sendline, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, (SA *) &amp;servaddr, <span class="hljs-keyword">sizeof</span>(servaddr)) &lt;<span class="hljs-number">0</span> ){
+			perror(<span class="hljs-string">&quot;sendto error&quot;</span>);
+			<span class="hljs-built_in">free</span>(preply_addr);
+			<span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);
+	}
+}
+
+<span class="hljs-type">int</span> <span class="hljs-title function_">m_signal</span><span class="hljs-params">(<span class="hljs-type">int</span> signum, <span class="hljs-type">void</span> handler(<span class="hljs-type">int</span>))</span>{
+    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">sigaction</span> <span class="hljs-title">new_action</span>, <span class="hljs-title">old_action</span>;</span>
+
+  <span class="hljs-comment">/* Set up the structure to specify the new action. */</span>
+    new_action.sa_handler = handler;
+    sigemptyset (&amp;new_action.sa_mask);
+    new_action.sa_flags = SA_RESTART;
+    ...
+}
+</code></pre>
+<p><strong>Usuniecie pętli for oraz przypisanie funkcji sig_alarm jako handlera sygnału SIGALARM</strong></p>
+<pre><code class="language-c">    m_signal(SIGALRM, sig_alarm);
+    ...
+
+	len = servlen;
+
+	<span class="hljs-keyword">if</span>( sendto(sockfd, sendline, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, pservaddr, servlen) &lt;<span class="hljs-number">0</span> ){
+		perror(<span class="hljs-string">&quot;sendto error&quot;</span>);
+		<span class="hljs-built_in">free</span>(preply_addr);
+		<span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);
+	}
+<span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> M_ALARM</span>
+	alarm(<span class="hljs-number">3</span>);
+<span class="hljs-meta">#<span class="hljs-keyword">endif</span></span>
+</code></pre>
+<h2 id="działanie-programu-bez-pętli-for">Działanie programu bez pętli for</h2>
+<img src="file:////Users/patryk/Desktop/Semestr_6/ProgramowanieSieciowe/lab4/zad2/zad2-2.png"  style="width:1000px">
+<h1 id="zad-3">Zad 3</h1>
+<h2 id="ustawanie-ttl-w-serwerze">ustawanie TTL w serwerze</h2>
+<pre><code class="language-c">TTL = strtol(argv[<span class="hljs-number">1</span>], <span class="hljs-literal">NULL</span>, <span class="hljs-number">10</span>);
+
+<span class="hljs-comment">// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP</span>
+<span class="hljs-keyword">if</span> (setsockopt(sockfd, IPPROTO_IP, IP_TTL, &amp;TTL, <span class="hljs-keyword">sizeof</span>(TTL)) &lt; <span class="hljs-number">0</span>){
+    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;IP_TTL error\n&quot;</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+}
+
+<span class="hljs-comment">// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP</span>
+<span class="hljs-keyword">if</span> (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &amp;TTL, <span class="hljs-keyword">sizeof</span>(TTL)) &lt; <span class="hljs-number">0</span>){
+    <span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;IPV6_UNICAST_HOPS error\n&quot;</span>);
+    <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+}
+</code></pre>
+<h2 id="odbeiranie-pola-ttl-w-kliencie">Odbeiranie pola TTL w kliencie</h2>
+<pre><code class="language-c">	<span class="hljs-comment">// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6</span>
+	<span class="hljs-type">int</span> yes = <span class="hljs-number">1</span>;
+	<span class="hljs-keyword">if</span>( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &amp;yes, <span class="hljs-keyword">sizeof</span>(yes)) &lt; <span class="hljs-number">0</span>){
+		<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;IP_RECVTTL setsockopt error : %s\n&quot;</span>, strerror(errno));
+		<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+
+	<span class="hljs-comment">// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP</span>
+	<span class="hljs-keyword">if</span>( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &amp;yes, <span class="hljs-keyword">sizeof</span>(yes)) &lt; <span class="hljs-number">0</span>){
+	<span class="hljs-built_in">fprintf</span>(<span class="hljs-built_in">stderr</span>, <span class="hljs-string">&quot;IP_RECVTTL setsockopt error : %s\n&quot;</span>, strerror(errno));
+	<span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;
+	}
+...
+
+<span class="hljs-comment">// Odbieranie TTL oraz IPV6_UNICAST_HOPS</span>
+<span class="hljs-keyword">for</span> (cmptr = CMSG_FIRSTHDR(&amp;msg); cmptr != <span class="hljs-literal">NULL</span>;
+        cmptr = CMSG_NXTHDR(&amp;msg, cmptr))
+{
+    <span class="hljs-keyword">if</span> (preply_addr-&gt;sa_family == AF_INET)
+    {
+        pdstaddrv4-&gt;sin_family = AF_INET;
+        <span class="hljs-keyword">if</span> (cmptr-&gt;cmsg_level == IPPROTO_IP &amp;&amp;
+            cmptr-&gt;cmsg_type == IP_PKTINFO)
+        {
+            <span class="hljs-built_in">memcpy</span>(&amp;pktinfov4, CMSG_DATA(cmptr), <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> in_pktinfo));
+            <span class="hljs-built_in">memcpy</span>(&amp;(pdstaddrv4-&gt;sin_addr), &amp;pktinfov4.ipi_addr, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> in_addr));
+            pdstaddrv4-&gt;sin_family = AF_INET;
+        }
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cmptr-&gt;cmsg_level == IPPROTO_IP &amp;&amp; cmptr-&gt;cmsg_type == IP_RECVTTL)
+        {
+            <span class="hljs-built_in">memcpy</span>(&amp;TTL, CMSG_DATA(cmptr), <span class="hljs-keyword">sizeof</span>(TTL));
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;TTL set to: %d\n&quot;</span>, TTL);
+        }
+        <span class="hljs-keyword">continue</span>;
+    }
+    <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (preply_addr-&gt;sa_family == AF_INET6)
+    {
+        pdstaddrv6-&gt;sin6_family = AF_INET6;
+        <span class="hljs-keyword">if</span> (cmptr-&gt;cmsg_level == IPPROTO_IPV6 &amp;&amp;
+            cmptr-&gt;cmsg_type == IPV6_PKTINFO)
+        {
+            <span class="hljs-built_in">memcpy</span>(&amp;pktinfov6, CMSG_DATA(cmptr),
+                    <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> in6_pktinfo));
+            <span class="hljs-built_in">memcpy</span>(&amp;(pdstaddrv6-&gt;sin6_addr), &amp;pktinfov6.ipi6_addr, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> in6_addr));
+            <span class="hljs-built_in">memcpy</span>(&amp;(pdstaddrv6-&gt;sin6_addr), &amp;pktinfov6.ipi6_addr, <span class="hljs-keyword">sizeof</span>(<span class="hljs-keyword">struct</span> in6_addr));
+        }
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (cmptr-&gt;cmsg_level == IPPROTO_IPV6 &amp;&amp;
+            cmptr-&gt;cmsg_type == IPV6_UNICAST_HOPS)
+        {
+            <span class="hljs-built_in">memcpy</span>(&amp;TTL, CMSG_DATA(cmptr), <span class="hljs-keyword">sizeof</span>(TTL));
+            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;TTL set to: %d\n&quot;</span>, TTL);
+        }
+        <span class="hljs-keyword">continue</span>;
+    }
+</code></pre>
+<p>Odbieranie wartości TTL czy IPV6_UNICAST_HOPS nie działa do końca poprawnie, jednak spędziliśmy nad tym niepoważnie dużą ilość czasu, wiec zdecydowaliśmy się zostawić to w stanie niedokończonym :)</p>
+
+        
+        
+    </body>
+    </html>

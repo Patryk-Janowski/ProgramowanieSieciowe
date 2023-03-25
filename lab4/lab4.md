@@ -2,6 +2,10 @@
 
 # Zad 1
 
+**Jan Czernecki**
+
+**Patryk Janowski**
+
 ## Nawiązanie połączenia:
 
 <img src="zad1/zad1-3/zad1-3.png"  style="width:1000px">
