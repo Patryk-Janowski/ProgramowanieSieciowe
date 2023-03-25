@@ -150,7 +150,7 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 				pdstaddrv4->sin_family = AF_INET;
 			} else if (cmptr->cmsg_level == IPPROTO_IP
                        && cmptr->cmsg_type == IP_TTL) {
-                   memcpy(&TTL, CMSG_DATA(cmsg), sizeof(TTL));
+                   memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
 				   printf("TTL set to: %d\n", TTL);
 			}
 		} else if (cmptr->cmsg_level == IPPROTO_IPV6 &&
