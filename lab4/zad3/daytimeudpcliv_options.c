@@ -66,21 +66,6 @@ int dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr *
 		return -1;
 	}
 
-	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
-	int yes = 1;
-	if (setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0)
-	{
-		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return -1;
-	}
-
-	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
-	if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0)
-	{
-		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return -1;
-	}
-
 	bzero(&msg, sizeof(msg));
 
 	msg.msg_control = control_un.control;
@@ -222,6 +207,7 @@ int main(int argc, char **argv)
 	char str[INET6_ADDRSTRLEN + 1];
 	int p_addr_len, data_len;
 	int ret;
+	int yes = 1;
 
 	preply_addr = (SA *)&reply_addr;
 	psrc_addr = (SA *)&src_addr;
@@ -261,6 +247,14 @@ int main(int argc, char **argv)
 				perror("setsockopt of IP_PKTINFO");
 				return 3;
 			}
+
+			// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+			
+			if (setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0)
+			{
+				fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+				return -1;
+			}
 		}
 
 		//	fprintf(stderr,"inet_pton error for %s : %s \n", argv[1], strerror(errno));
@@ -284,6 +278,13 @@ int main(int argc, char **argv)
 		{
 			perror("setsockopt of IPV6_RECVPKTINFO");
 			return 2;
+		}
+
+		// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
+		if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0)
+		{
+			fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+			return -1;
 		}
 	}
 
