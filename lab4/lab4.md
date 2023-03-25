@@ -166,7 +166,6 @@ if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
 
 
 ```c
-
 	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
 	int yes = 1;
 	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
@@ -179,16 +178,47 @@ if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
 	fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 	return -1;
 	}
+...
 
-// Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
-(cmptr->cmsg_level == IPPROTO_IPV6 &&
-			cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
-			memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
-			printf("TTL set to: %d\n", TTL);
-        
-... 
-
-
-
+// Odbieranie TTL oraz IPV6_UNICAST_HOPS
+for (cmptr = CMSG_FIRSTHDR(&msg); cmptr != NULL;
+        cmptr = CMSG_NXTHDR(&msg, cmptr))
+{
+    if (preply_addr->sa_family == AF_INET)
+    {
+        pdstaddrv4->sin_family = AF_INET;
+        if (cmptr->cmsg_level == IPPROTO_IP &&
+            cmptr->cmsg_type == IP_PKTINFO)
+        {
+            memcpy(&pktinfov4, CMSG_DATA(cmptr), sizeof(struct in_pktinfo));
+            memcpy(&(pdstaddrv4->sin_addr), &pktinfov4.ipi_addr, sizeof(struct in_addr));
+            pdstaddrv4->sin_family = AF_INET;
+        }
+        else if (cmptr->cmsg_level == IPPROTO_IP && cmptr->cmsg_type == IP_RECVTTL)
+        {
+            memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
+            printf("TTL set to: %d\n", TTL);
+        }
+        continue;
+    }
+    else if (preply_addr->sa_family == AF_INET6)
+    {
+        pdstaddrv6->sin6_family = AF_INET6;
+        if (cmptr->cmsg_level == IPPROTO_IPV6 &&
+            cmptr->cmsg_type == IPV6_PKTINFO)
+        {
+            memcpy(&pktinfov6, CMSG_DATA(cmptr),
+                    sizeof(struct in6_pktinfo));
+            memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
+            memcpy(&(pdstaddrv6->sin6_addr), &pktinfov6.ipi6_addr, sizeof(struct in6_addr));
+        }
+        else if (cmptr->cmsg_level == IPPROTO_IPV6 &&
+            cmptr->cmsg_type == IPV6_UNICAST_HOPS)
+        {
+            memcpy(&TTL, CMSG_DATA(cmptr), sizeof(TTL));
+            printf("TTL set to: %d\n", TTL);
+        }
+        continue;
+    }
 ``` 
-
+Odbieranie wartości TTL czy IPV6_UNICAST_HOPS nie działa do końca poprawnie, jednak spędziliśmy nad tym niepoważnie dużą ilość czasu, wiec zdecydowaliśmy się zostawić to w stanie niedokończonym :) 
