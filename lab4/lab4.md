@@ -149,25 +149,37 @@ int m_signal(int signum, void handler(int)){
 ```c
 TTL = strtol(argv[1], NULL, 10);
 
-// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
-	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
+if (setsockopt(sockfd, IPPROTO_IP, IP_TTL, &TTL, sizeof(TTL)) < 0){
+    fprintf(stderr, "IP_TTL error\n");
+    return -1;
+}
+
+// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
+if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
+    fprintf(stderr, "IPV6_UNICAST_HOPS error\n");
+    return -1;
+}
+```
+
+## Odbeiranie pola TTL w kliencie
+
+
+```c
+
+	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
 	int yes = 1;
 	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 		return -1;
 	}
 
-
-	// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
-	if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
-		fprintf(stderr, "IPV6_UNICAST_HOPS error\n");
-		return 1;
+	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+	fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+	return -1;
 	}
-```
 
-## Odbeiranie pola TTL w kliencie
-
-```c
 // Ustawianie opcji TTL w gnieździe na poziomie warstwy IP
 (cmptr->cmsg_level == IPPROTO_IPV6 &&
 			cmptr->cmsg_type == IPV6_UNICAST_HOPS) {
@@ -175,6 +187,7 @@ TTL = strtol(argv[1], NULL, 10);
 			printf("TTL set to: %d\n", TTL);
         
 ... 
+
 
 
 ``` 

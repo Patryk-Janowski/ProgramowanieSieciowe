@@ -90,17 +90,17 @@ main(int argc, char **argv)
 			return 1;
 	}
 
-	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
-	int yes = 1;
-	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
-		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+	
+	// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
+	if (setsockopt(sockfd, IPPROTO_IP, IP_TTL, &TTL, sizeof(TTL)) < 0){
+		fprintf(stderr, "IP_TTL error\n");
 		return -1;
 	}
 
 	// Ustawianie opcji IPV6_UNICASTHOPS w gnieździe na poziomie warstwy IP
 	if (setsockopt(sockfd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &TTL, sizeof(TTL)) < 0){
 		fprintf(stderr, "IPV6_UNICAST_HOPS error\n");
-		return 1;
+		return -1;
 	}
 
 	bzero(&servaddr, sizeof(servaddr));

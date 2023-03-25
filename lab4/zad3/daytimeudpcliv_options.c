@@ -65,11 +65,17 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 		return -1;
 	}
 
-	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
 	int yes = 1;
 	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
 		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 		return -1;
+	}
+
+	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
+	fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+	return -1;
 	}
 
 	
@@ -142,6 +148,9 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 					   sizeof(struct in_pktinfo));
 				memcpy(&(pdstaddrv4->sin_addr), &pktinfov4.ipi_addr, sizeof(struct in_addr));
 				pdstaddrv4->sin_family = AF_INET;
+			} else if (cmptr->cmsg_level == IPPROTO_IP
+                       && cmptr->cmsg_type == IP_TTL) {
+                   memcpy(&TTL, CMSG_DATA(cmsg), sizeof(TTL));
 			}
 		} else if (cmptr->cmsg_level == IPPROTO_IPV6 &&
 		cmptr->cmsg_type == IPV6_PKTINFO) {
