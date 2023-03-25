@@ -172,8 +172,11 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 			(int)cmptr->cmsg_len, cmptr->cmsg_level, cmptr->cmsg_type);
 			}
 		}
+		}
 		return 1;
+
 }
+
 
 		
 
