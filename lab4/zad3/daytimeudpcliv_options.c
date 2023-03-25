@@ -75,10 +75,10 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 
 	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
 
-	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
-		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return -1;
-	}
+	// if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
+	// 	fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+	// 	return -1;
+	// }
 	
 	bzero(&msg, sizeof(msg));
 
