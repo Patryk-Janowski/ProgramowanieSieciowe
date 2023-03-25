@@ -65,19 +65,18 @@ dt_cli(int sockfd, const SA *pservaddr, socklen_t servlen, struct sockaddr	*prep
 		return -1;
 	}
 
-	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
-	int yes = 1;
-	if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
-		fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
-		return -1;
-	}
-
-	// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
+		// Ustawianie opcji odbierania TTL w gnieździe na poziomie warstwy IP
 	if( setsockopt(sockfd, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes)) < 0){
 	fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
 	return -1;
 	}
 
+	// Ustawianie opcji odbierania HOP LIMIT w gnieździe na poziomie warstwy IPv6
+	// int yes = 1;
+	// if( setsockopt(sockfd, IPPROTO_IPV6, IPV6_RECVHOPLIMIT, &yes, sizeof(yes)) < 0){
+	// 	fprintf(stderr, "IP_RECVTTL setsockopt error : %s\n", strerror(errno));
+	// 	return -1;
+	// }
 	
 	bzero(&msg, sizeof(msg));
 
