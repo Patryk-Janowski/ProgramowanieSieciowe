@@ -8,6 +8,8 @@
 #include <netinet/in.h>  /* sockaddr_in{} and other Internet defns */
 #include <arpa/inet.h>   /* inet(3) functions */
 #include <errno.h>
+#include <time.h>
+#include <sys/time.h>
 
 
 #define MAXLINE 500
@@ -19,7 +21,17 @@ int main(int argc, char *argv[])
 	int s, peer_addr_len, addr_len, recv_flag=0;
 	char	recvline[MAXLINE + 1];
 	struct timeval delay;
-	char host[NI_MAXHOST], service[NI_MAXSERV];  
+	char host[NI_MAXHOST], service[NI_MAXSERV];
+	time_t start;
+    time_t end;
+    time(&start);
+    time(&end);
+    char msg_s[21];
+    char msg_r[21] = {0};
+    unsigned long long us;
+    struct timeval time1;
+    unsigned long long us2;
+    struct timeval time2;  
 
 	if (argc != 2){
 		fprintf(stderr, "usage: %s <IPaddress> \n", argv[0]);
@@ -61,18 +73,24 @@ int main(int argc, char *argv[])
 	}
 
     /* Send request - empty datagram to server  and receive responses*/
+     	
+	gettimeofday(&time1, NULL);
+	us = time1.tv_sec * 1000000ULL + time1.tv_usec;
+	
+	snprintf(msg_s, sizeof(msg_s), "%llu", us);
 
-	for(i=0; i < 4 ; i++ ){
-
-		if(recv_flag == 0 )
-			if( sendto(sfd, recvline, 0, 0, (struct sockaddr *)&servaddrv4 , addr_len) <0 ){
+	if( sendto(sfd, msg_s, strlen(msg_s), 0, (struct sockaddr *)&servaddrv4 , addr_len) <0 ){
 				perror("sendto error");
 				exit(1);
-			}
+		}
+	
+	alarm(6);
+	for( ;; ){
+		time(&end);
 		peer_addr_len = sizeof(peer_addr);
 		if( (n = recvfrom(sfd, recvline, MAXLINE, 0, (struct sockaddr *) &peer_addr, 
 																	&peer_addr_len )) < 0 ){
-			if( (errno == (EAGAIN | EWOULDBLOCK)) && (i < 2) ){
+			if(errno == (EAGAIN | EWOULDBLOCK)) {
 				printf("Waiting for response ...\n");
 				continue;
 			}
@@ -81,24 +99,32 @@ int main(int argc, char *argv[])
 				exit(1);
 			}
 		}else{
-			recv_flag=1;
-			break;
-		}
-	}
-			
-	s = getnameinfo((struct sockaddr *) &peer_addr,
+			s = getnameinfo((struct sockaddr *) &peer_addr,
 				peer_addr_len, host, NI_MAXHOST,
-				service, NI_MAXSERV, NI_NUMERICSERV | NI_NUMERICHOST);
-	if (s == 0)
-		printf("Received %ld bytes from %s:%s\n", (long) n, host, service);
-	else
-		fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
-		
-	recvline[n] = 0;	/* null terminate */
-	if (fputs(recvline, stdout) == EOF){
-		fprintf(stderr,"fputs error : %s\n", strerror(errno));
-		exit(1);
-	}        		
+						service, NI_MAXSERV, NI_NUMERICSERV | NI_NUMERICHOST);
+			if (s == 0)
+				printf("Received %ld bytes from %s:%s\n", (long) n, host, service);
+			else
+				fprintf(stderr, "getnameinfo: %s\n", gai_strerror(s));
 				
+			recvline[n] = 0;	/* null terminate */
+			if (fputs(recvline, stdout) == EOF){
+				fprintf(stderr,"fputs error : %s\n", strerror(errno));
+				exit(1);
+			}     
+			gettimeofday(&time2, NULL);
+			us2 = time2.tv_sec * 1000000ULL + time2.tv_usec;
+			
+			char* end = strchr(recvline, '\n');
+			if (end != NULL)
+			{
+			    strncpy(msg_r, recvline, end - recvline);
+			}
+			int us1 = atoi(msg_r);
+			
+			printf("Round trip time: %d\n", us2-us1);
+			
+		}
+	}		
 	exit(EXIT_SUCCESS);
 }

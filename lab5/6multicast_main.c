@@ -272,16 +272,17 @@ void send_all(int sendfd, SA *sadest, socklen_t salen)
 {
 	char		line[MAXLINE];		/* hostname and process ID */
 	struct utsname	myname;
+	char wiad[MAXLINE];
+
+	fgets(wiad, MAXLINE, stdin);
 
 	if (uname(&myname) < 0)
 		perror("uname error");
-	snprintf(line, sizeof(line), "%s, PID=%d", myname.nodename, getpid());
+	snprintf(line, sizeof(line), "%s: %s", myname.nodename, wiad);
 
-	for ( ; ; ) {
-		if(sendto(sendfd, line, strlen(line), 0, sadest, salen) < 0 )
-		  fprintf(stderr,"sendto() error : %s\n", strerror(errno));
-		sleep(SENDRATE);
-	}
+	if(sendto(sendfd, line, strlen(line), 0, sadest, salen) < 0 )
+        fprintf(stderr,"sendto() error : %s\n", strerror(errno));
+    sleep(SENDRATE);
 }
 
 void recv_all(int recvfd, socklen_t salen)
@@ -313,7 +314,7 @@ void recv_all(int recvfd, socklen_t salen)
 		      inet_ntop(AF_INET, (struct sockaddr  *) &cliaddrv4->sin_addr,  addr_str, sizeof(addr_str));
 		}
 
-		printf("Datagram from %s : %s (%d bytes)\n", addr_str, line, n);
+		printf("%s", line);
 		fflush(stdout);
 	}
 }
@@ -369,7 +370,7 @@ main(int argc, char **argv)
 	  ipv4addr->sin_addr.s_addr =  htonl(INADDR_ANY);
 
 	  struct in_addr        localInterface;
-	  localInterface.s_addr = inet_addr("127.0.0.1");
+	  localInterface.s_addr = if_nametoindex(argv[2]);
 	  if (setsockopt(sendfd, IPPROTO_IP, IP_MULTICAST_IF,
 						(char *)&localInterface,
 						sizeof(localInterface)) < 0) {
@@ -393,5 +394,7 @@ main(int argc, char **argv)
 	if (fork() == 0)
 		recv_all(recvfd, salen);	/* child -> receives */
 
-	send_all(sendfd, sasend, salen);	/* parent -> sends */
+	for (;;){
+		send_all(sendfd, sasend, salen);	/* parent -> sends */
+	}
 }

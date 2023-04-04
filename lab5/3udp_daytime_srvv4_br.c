@@ -12,6 +12,7 @@
 #include        <stdlib.h>
 #include        <string.h>
 #include	<unistd.h>
+#include        <sys/utsname.h>
 
 #define MAXLINE 1024
 #define SA struct sockaddr
@@ -24,14 +25,21 @@ day_time_br(int sockfd, SA *pcliaddr, socklen_t clilen)
 	char		mesg[MAXLINE];
 	char		str[INET6_ADDRSTRLEN+1];
 	time_t		ticks;
+    struct utsname      bufor[0];
 
-	fprintf(stderr,"Sending day time for clients ... \n");
+    if ( (uname(bufor)<0) ){
+        fprintf( stderr,"utsname error: %s\n", strerror(errno) );
+    }
+
+	printf("System name: %s\n", bufor[0].sysname);
 
 	for ( ; ; ) {
 		ticks = time(NULL);
-		snprintf(mesg, sizeof(mesg), "PS daytime server: %.24s\r\n", ctime(&ticks));
-		fprintf(stdout,"Sending day time for clients : %s  \n", mesg);
-		
+		snprintf(mesg, sizeof(mesg), "PS daytime server: %.24s Server info: %s %s\r\n", ctime(&ticks), bufor[0].release, bufor[0].version);
+		if( mesg[0] != '\0' ) {
+			fprintf(stdout,"%s\n", mesg);
+		}
+
 		if( sendto(sockfd, mesg, strlen(mesg), 0, pcliaddr, len) < 0 ) {
                	fprintf(stderr,"sendto error : %s\n", strerror(errno));
              	continue;
@@ -39,8 +47,6 @@ day_time_br(int sockfd, SA *pcliaddr, socklen_t clilen)
 		sleep(2);
 	}
 }
-
-	
 
 int
 main(int argc, char **argv)

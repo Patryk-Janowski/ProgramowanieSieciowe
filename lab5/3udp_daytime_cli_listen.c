@@ -16,6 +16,7 @@
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <string.h>
+#include        <sys/utsname.h>
 
 #define MAXLINE 500
 
@@ -28,18 +29,22 @@ main(int argc, char *argv[])
 	socklen_t			len;
 	char				recvline[MAXLINE], str[INET6_ADDRSTRLEN+1];
 	time_t				ticks;
-	struct sockaddr_in6	servaddr, peer_addr;
+	struct sockaddr_in	servaddr, peer_addr;
 	char host[NI_MAXHOST], service[NI_MAXSERV];
+	struct utsname msg;
 
-   if ( (sfd = socket(AF_INET6, SOCK_DGRAM, 0)) < 0){
-          fprintf(stderr,"socket error : %s\n", strerror(errno));
-          return 1;
-   }
+	uname(&msg);
+	printf("Daytime server: %.24s\r\nSystem name: %s \nNodename: %s \n", ctime(&ticks), msg.sysname, msg.nodename);
+
+	if ( (sfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0){
+		fprintf(stderr,"socket error : %s\n", strerror(errno));
+		return 1;
+	}
 
 	bzero(&servaddr, sizeof(servaddr));
-	servaddr.sin6_family = AF_INET6;
-	servaddr.sin6_addr   = in6addr_any;
-	servaddr.sin6_port   = htons(13);	/* daytime server */
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr   = 0;
+	servaddr.sin_port   = htons(13);	/* daytime server */
 
 	if ( bind( sfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0){
 		fprintf(stderr,"bind error : %s\n", strerror(errno));
@@ -53,8 +58,8 @@ main(int argc, char *argv[])
 		fprintf(stderr,"SO_RCVTIMEO setsockopt error : %s\n", strerror(errno));
 		return 1;
 	}		
-		
-	for( i=0 ; i < 3 ; i++){
+	alarm(6);	
+	for(;;){
 	        /* Read data from server */
 		fprintf(stderr, "Waiting for server ...\n");
 	
@@ -72,7 +77,6 @@ main(int argc, char *argv[])
 				exit(1);
 			}
 		}
-	
 		s = getnameinfo((struct sockaddr *) &peer_addr,
 						len, host, NI_MAXHOST,
 						service, NI_MAXSERV, NI_NUMERICSERV | NI_NUMERICHOST);
@@ -87,7 +91,7 @@ main(int argc, char *argv[])
 			fprintf(stderr,"fputs error : %s\n", strerror(errno));
 			exit(1);
 		}        
-			
 	}
+		
 	exit(EXIT_SUCCESS);
 }

@@ -28,6 +28,7 @@ dg_echo(int sockfd, SA *pcliaddr, socklen_t clilen)
 	int		n;
 	socklen_t	len;
 	char		mesg[MAXLINE];
+	char		recvline[MAXLINE];
 	char		str[INET6_ADDRSTRLEN+1];
 	time_t		ticks;
 	struct sockaddr_in6*	 cliaddr;
@@ -38,7 +39,7 @@ dg_echo(int sockfd, SA *pcliaddr, socklen_t clilen)
 	fprintf(stderr,"Waiting for clients ... \n");
 	for ( ; ; ) {
 		len = clilen;
-		if( (n = recvfrom(sockfd, mesg, MAXLINE, 0, pcliaddr, &len)) < 0 ){
+		if( (n = recvfrom(sockfd, recvline, MAXLINE, 0, pcliaddr, &len)) < 0 ){
                 	fprintf(stderr,"recvfrom error : %s\n", strerror(errno));
  //               	continue;
 			exit(1);		    
@@ -55,9 +56,8 @@ dg_echo(int sockfd, SA *pcliaddr, socklen_t clilen)
 		}
 
 		printf("Connection from %s\n", str);
-
 		ticks = time(NULL);
-		snprintf(mesg, sizeof(mesg), "PS daytime server: %.24s\r\n", ctime(&ticks));
+		snprintf(mesg, sizeof(mesg), "%s\nPS daytime server: %.24s\r\n", recvline, ctime(&ticks));
 //		sleep(1);
 		if( sendto(sockfd, mesg, strlen(mesg), 0, pcliaddr, len) < 0 ) {
                 	fprintf(stderr,"sendto error : %s\n", strerror(errno));
