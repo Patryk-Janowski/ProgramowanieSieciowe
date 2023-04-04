@@ -1,17 +1,18 @@
-#include        <sys/types.h>   /* basic system data types */
-#include        <sys/socket.h>  /* basic socket definitions */
-#include        <sys/time.h>    /* timeval{} for select() */
-#include        <time.h>                /* timespec{} for pselect() */
-#include        <netinet/in.h>  /* sockaddr_in{} and other Internet defns */
-#include        <arpa/inet.h>   /* inet(3) functions */
-#include        <errno.h>
-#include        <fcntl.h>               /* for nonblocking */
-#include        <netdb.h>
-#include        <signal.h>
-#include        <stdio.h>
-#include        <stdlib.h>
-#include        <string.h>
+#include    <sys/types.h>   /* basic system data types */
+#include    <sys/socket.h>  /* basic socket definitions */
+#include    <sys/time.h>    /* timeval{} for select() */
+#include    <time.h>                /* timespec{} for pselect() */
+#include    <netinet/in.h>  /* sockaddr_in{} and other Internet defns */
+#include    <arpa/inet.h>   /* inet(3) functions */
+#include    <errno.h>
+#include    <fcntl.h>               /* for nonblocking */
+#include    <netdb.h>
+#include    <signal.h>
+#include    <stdio.h>
+#include    <stdlib.h>
+#include    <string.h>
 #include	<netinet/tcp.h>		/* for TCP_MAXSEG */
+#include 	<netinet/sctp.h>
 #include	<unistd.h>
 
 #define SA      struct sockaddr
@@ -32,7 +33,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-	if ( (sockfd = socket(AF_INET6, SOCK_STREAM, 0)) < 0){
+	if ( (sockfd = socket(AF_INET6, SOCK_STREAM, IPPROTO_SCTP)) < 0){
                 fprintf(stderr,"socket error : %s\n", strerror(errno));
                 return 1;
     }
@@ -44,7 +45,7 @@ main(int argc, char **argv)
 		return 2;
 	}
 	len = sizeof(mss);
-	if( getsockopt(sockfd, IPPROTO_TCP, TCP_MAXSEG, &mss, &len) == -1 ){
+	if( getsockopt(sockfd, IPPROTO_SCTP, SCTP_MAXSEG, &mss, &len) == -1 ){
 		fprintf(stderr,"getsockopt error : %s\n", strerror(errno));
 		return 3;
 	}
@@ -66,12 +67,12 @@ main(int argc, char **argv)
 
 #define MSS 1300
 	mss=MSS;
-	if( setsockopt(sockfd, IPPROTO_TCP, TCP_MAXSEG, &mss, sizeof(mss)) == -1){
+	if( setsockopt(sockfd, IPPROTO_SCTP, SCTP_MAXSEG, &mss, sizeof(mss)) == -1){
 		fprintf(stderr,"setsockopt error : %s\n", strerror(errno));
 		return 1;
 	}
 	len = sizeof(mss);
-	if( getsockopt(sockfd, IPPROTO_TCP, TCP_MAXSEG, &mss, &len) == -1 ){
+	if( getsockopt(sockfd, IPPROTO_SCTP, SCTP_MAXSEG, &mss, &len) == -1 ){
 		fprintf(stderr,"getsockopt error : %s\n", strerror(errno));
 		return 3;
 	}
@@ -104,7 +105,7 @@ main(int argc, char **argv)
 
 	}
 	len = sizeof(mss);
-	if( getsockopt(sockfd, IPPROTO_TCP, TCP_MAXSEG, &mss, &len) == -1){
+	if( getsockopt(sockfd, IPPROTO_SCTP, SCTP_MAXSEG, &mss, &len) == -1){
 		fprintf(stderr,"getsockopt error (6) : %s\n", strerror(errno));
 		return 6;
 	}
@@ -140,10 +141,7 @@ main(int argc, char **argv)
 		    fprintf(stderr,"Reading from socket in: %d ms, : in %d segments (%lu)(%lf mbit/s)\n", s/1000,
 		                   count, size, tr );
 		}
-	 
 	}
-
 	fflush(stdout);
-
 	exit(0);
 }
