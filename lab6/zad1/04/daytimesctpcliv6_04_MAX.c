@@ -16,7 +16,7 @@
 #include	<unistd.h>
 
 #define SA      struct sockaddr
-#define MAXLINE 2048
+#define MAXLINE 1024
 
 int
 main(int argc, char **argv)
