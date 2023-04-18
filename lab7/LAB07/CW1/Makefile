@@ -2,8 +2,7 @@ CC=gcc
 CFLAGS=-I. -lm
 #CFLAGS=
 
-OBJECTS = tcpcliv6_echo tcpcliv6_select_echo tcpserv6_ws_echo_poll tcpserv6_ws_echo_select
-# tcpserv6_ws_echo_fork
+OBJECTS = tcpcliv6_echo tcpcliv6_select_echo tcpserv6_ws_echo_poll tcpserv6_ws_echo_select tcpserv6_ws_echo_fork
 all: $(OBJECTS)
 
 $(OBJECTS):%:%.c
