@@ -23,7 +23,7 @@
 #define SA struct sockaddr
 #define LISTENQ 2
 #define INFTIM -1
-#define MAXEVENTS 2000
+#define MAXEVENTS 100000
 
 
 ssize_t						/* Write "n" bytes to a descriptor. */

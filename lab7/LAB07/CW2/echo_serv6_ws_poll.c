@@ -24,7 +24,7 @@
 #define SA struct sockaddr
 #define LISTENQ 10
 #define INFTIM -1
-#define MAXEVENTS 2000
+#define MAXEVENTS 100000
 
 #define POLL
 
