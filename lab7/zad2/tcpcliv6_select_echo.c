@@ -115,7 +115,7 @@ str_cli(FILE *fp, int sockfd)
 				continue;
 			}
 
-			Writen(sockfd, buf, n);
+			Writen(sockfd, buf, n-2);
 			
 		}
 	}
