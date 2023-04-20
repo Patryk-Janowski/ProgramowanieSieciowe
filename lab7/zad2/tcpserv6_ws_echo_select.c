@@ -168,7 +168,7 @@ main(int argc, char **argv)
 	delay.tv_sec =2;  //opozienie na gniezdzie
 	delay.tv_usec = 1; 
 	len = sizeof(delay);
-	if( setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &delay, len) == -1 ){
+	if( setsockopt(listenfd, SOL_SOCKET, SO_RCVTIMEO, &delay, len) == -1 ){
 		fprintf(stderr,"SO_RCVTIMEO setsockopt error : %s\n", strerror(errno));
 		return 1;
 	}
