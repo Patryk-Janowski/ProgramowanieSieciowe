@@ -162,6 +162,16 @@ main(int argc, char **argv)
 	        fprintf(stderr,"bind error : %s\n", strerror(errno));
 	        return 1;
 	}
+
+	struct timeval delay;
+	socklen_t		len;
+	delay.tv_sec =2;  //opozienie na gniezdzie
+	delay.tv_usec = 1; 
+	len = sizeof(delay);
+	if( setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &delay, len) == -1 ){
+		fprintf(stderr,"SO_RCVTIMEO setsockopt error : %s\n", strerror(errno));
+		return 1;
+	}
 	
 	if ( listen(listenfd, LISTENQ) < 0){
 	        fprintf(stderr,"listen error : %s\n", strerror(errno));
