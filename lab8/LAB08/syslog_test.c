@@ -3,7 +3,7 @@
  
 
 int main(int argc, char **argv){
-	setlogmask (LOG_UPTO (LOG_NOTICE));
+	setlogmask (LOG_UPTO (LOG_LOCAL7+1));
 	
 	openlog (argv[0], LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL7);
 	
@@ -11,6 +11,7 @@ int main(int argc, char **argv){
 	syslog (LOG_NOTICE, "ERRNO = %m");
 	syslog (LOG_INFO, "A tree falls in a forest");
 	syslog (LOG_ERR, "A big tree falls in a forest");
+	syslog (LOG_LOCAL7, "local log 777");
 	
 	closelog ();
 }
