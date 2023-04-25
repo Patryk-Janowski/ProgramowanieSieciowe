@@ -3,7 +3,7 @@
  
 
 int main(int argc, char **argv){
-	setlogmask (LOG_UPTO (LOG_LOCAL7+1));
+	setlogmask (LOG_UPTO (LOG_INFO));
 	
 	openlog (argv[0], LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL7);
 	
