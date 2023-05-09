@@ -105,7 +105,7 @@ int set_mac_addr( char* name, char* mac)
 	return 0;
 }
 
-int enable_promiscuous_mode(char *int_name) {
+int change_promiscuous_mode(char *int_name, int on_off) {
 
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0) {
@@ -122,8 +122,12 @@ int enable_promiscuous_mode(char *int_name) {
         return 1;
     }
 
-    ifr.ifr_flags |= IFF_PROMISC;
-
+	if (on_off){
+		ifr.ifr_flags |= IFF_PROMISC;
+	} else {
+		ifr.ifr_flags &= IFF_PROMISC;
+	}
+    
     if (ioctl(sockfd, SIOCSIFFLAGS, &ifr) < 0) {
         perror("ioctl SIOCSIFFLAGS");
         return 1;
@@ -135,7 +139,6 @@ int enable_promiscuous_mode(char *int_name) {
 
     return 0;
 }
-
 
 
 int main(int argc, char* argv[]){
@@ -156,16 +159,17 @@ int main(int argc, char* argv[]){
 		
 		if( get_mac_addr( argv[1], NULL ) < 0 )
 			printf("get_mac_addr error: %s \n", strerror ( errno ) );
-		
-		if (enable_promiscuous_mode(argv[1]) != 0);
-			printf("set promiscuous mode error: %s \n", strerror ( errno ) );
 	}	
 	
 	if( argc == 3 ){
 		if( set_mac_addr( argv[1], argv[2] ) < 0 )
 			printf("set_mac_addr error: %s \n", strerror ( errno ) );;
 	}
-	if( argc > 3 )
+
+	if( argc == 4 ) {
+		if (enable_promiscuous_mode(argv[1], atoi(argv[4])) != 0);
+			printf("set promiscuous mode error: %s \n", strerror ( errno ) );
+	}
 		printf("Unsupported operation \n");
 	
     return 0;
