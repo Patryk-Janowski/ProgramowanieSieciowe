@@ -105,6 +105,38 @@ int set_mac_addr( char* name, char* mac)
 	return 0;
 }
 
+int enable_promiscuous_mode(char *int_name) {
+
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) {
+        perror("socket");
+        return 1;
+    }
+
+    struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    strncpy(ifr.ifr_name, int_name, IFNAMSIZ-1);
+
+    if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0) {
+        perror("ioctl SIOCGIFFLAGS");
+        return 1;
+    }
+
+    ifr.ifr_flags |= IFF_PROMISC;
+
+    if (ioctl(sockfd, SIOCSIFFLAGS, &ifr) < 0) {
+        perror("ioctl SIOCSIFFLAGS");
+        return 1;
+    }
+
+    printf("Promiscuous mode enabled on interface %s\n", int_name);
+
+    close(sockfd);
+
+    return 0;
+}
+
+
 
 int main(int argc, char* argv[]){
   
@@ -127,8 +159,11 @@ int main(int argc, char* argv[]){
 	}
 	
 	if( argc == 3 )
-		if( set_mac_addr( argv[1], argv[2] ) < 0 )
+		if (argv[2] == 'p'){
+			enable_promiscuous_mode(argv[1]);
+		} else if( set_mac_addr( argv[1], argv[2] ) < 0 ){
 			printf("set_mac_addr error: %s \n", strerror ( errno ) );;
+		}
 	
 	if( argc > 3 )
 		printf("Unsupported operation \n");
