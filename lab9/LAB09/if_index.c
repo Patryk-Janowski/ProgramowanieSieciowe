@@ -161,12 +161,12 @@ int main(int argc, char* argv[]){
 			printf("get_mac_addr error: %s \n", strerror ( errno ) );
 	}	
 	
-	// if( argc == 3 ){
-	// 	if( set_mac_addr( argv[1], argv[2] ) < 0 )
-	// 		printf("set_mac_addr error: %s \n", strerror ( errno ) );;
-	// }
+	if( argc == 3 ){
+		if( set_mac_addr( argv[1], argv[2] ) < 0 )
+			printf("set_mac_addr error: %s \n", strerror ( errno ) );;
+	}
 
-	if( argc == 3 ) {
+	if( argc == 4 ) {
 		if (change_promiscuous_mode(argv[1], atoi(argv[4])) != 0);
 			printf("set promiscuous mode error: %s \n", strerror ( errno ) );
 	}
