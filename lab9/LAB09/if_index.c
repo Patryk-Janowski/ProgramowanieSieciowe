@@ -122,7 +122,7 @@ int change_promiscuous_mode(char *int_name, int on_off) {
         return 1;
     }
 
-	if (on_off){
+	if (on_off > 0){
 		ifr.ifr_flags |= IFF_PROMISC;
 	} else {
 		ifr.ifr_flags &= IFF_PROMISC;
