@@ -158,13 +158,14 @@ int main(int argc, char* argv[]){
 			printf("get_mac_addr error: %s \n", strerror ( errno ) );
 	}
 	
-	if( argc == 3 )
-		if (argv[2] == 'p'){
+	if( argc == 3 ){
+		char *p = 'p';
+		if (strncmp(argv[2], p, 1)){
 			enable_promiscuous_mode(argv[1]);
 		} else if( set_mac_addr( argv[1], argv[2] ) < 0 ){
 			printf("set_mac_addr error: %s \n", strerror ( errno ) );;
 		}
-	
+	}
 	if( argc > 3 )
 		printf("Unsupported operation \n");
 	
