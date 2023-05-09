@@ -167,7 +167,7 @@ int main(int argc, char* argv[]){
 	}
 
 	if( argc == 4 ) {
-		if (change_promiscuous_mode(argv[1], atoi(argv[4])) != 0);
+		if (change_promiscuous_mode(argv[1], atoi(argv[3])) != 0);
 			printf("set promiscuous mode error: %s \n", strerror ( errno ) );
 	}
 		printf("Unsupported operation \n");
