@@ -11,7 +11,7 @@ int main(int argc, char **argv){
 	syslog (LOG_NOTICE, "ERRNO = %m");
 	syslog (LOG_INFO, "A tree falls in a forest");
 	syslog (LOG_ERR, "A big tree falls in a forest");
-	syslog (LOG_LOCAL7, "local log 777");
+	syslog (LOG_ERR, "local log 777");
 	
 	closelog ();
 }
