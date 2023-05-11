@@ -184,19 +184,24 @@ int main(int argc, char* argv[]){
 			int promiscuous = 0; // default to off
 			if (strcmp(argv[3], "on") == 0) {
 				promiscuous = 1;
+				if (set_promiscuous_mode(argv[1], promiscuous) < 0) {
+					printf("Failed to set promiscuous mode\n");
+					exit(EXIT_FAILURE);
+				}
 				printf("Promiscuous mode: ON\n");
 			} else if (strcmp(argv[3], "off") == 0) {
 				promiscuous = 0;
+				if (set_promiscuous_mode(argv[1], promiscuous) < 0) {
+					printf("Failed to set promiscuous mode\n");
+					exit(EXIT_FAILURE);
+				}
 				printf("Promiscuous mode: OFF\n");
 			} else {
 				printf("Invalid argument for promiscuous mode: %s\n", argv[3]);
 				exit(EXIT_FAILURE);
 			}
-		if (set_promiscuous_mode(argv[1], promiscuous) < 0) {
-			printf("Failed to set promiscuous mode\n");
-			exit(EXIT_FAILURE);
-		}
-		
+	
+
     } else 
 		printf("Unsupported operation \n");
 	}
