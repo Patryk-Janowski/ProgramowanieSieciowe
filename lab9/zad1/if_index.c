@@ -166,7 +166,7 @@ int main(int argc, char* argv[]){
 	if( argc == 2 ){	
 		idx = _if_nametoindex(argv[1]);
 
-		set_promiscuous_mode(argv[1], 1);
+		set_promiscuous_mode(argv[1], 0);
 
 		if( idx != -1 )
 			printf("Index of interface %s = %u (%u)\n", argv[1], idx, if_nametoindex(argv[1]));
