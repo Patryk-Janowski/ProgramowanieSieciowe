@@ -180,7 +180,7 @@ int main(int argc, char* argv[]){
 			printf("set_mac_addr error: %s \n", strerror ( errno ) );;
 
     if (argc == 4) {
-		if (strcmp(argv[2], "p")) {
+		if (strcmp(argv[2], "promiscuous")) {
 			int promiscuous = 0; // default to off
 			if (strcmp(argv[3], "on") == 0) {
 				promiscuous = 1;
@@ -189,7 +189,7 @@ int main(int argc, char* argv[]){
 				promiscuous = 0;
 				printf("Promiscuous mode: OFF\n");
 			} else {
-				printf("Invalid argument for promiscuous mode: %s\n", argv[2]);
+				printf("Invalid argument for promiscuous mode: %s\n", argv[3]);
 				exit(EXIT_FAILURE);
 			}
     } else 
