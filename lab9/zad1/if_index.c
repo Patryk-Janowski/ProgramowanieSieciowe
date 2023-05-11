@@ -181,7 +181,7 @@ int main(int argc, char* argv[]){
 
     if (argc == 4) {
 		printf(argv[2]);
-		if (strcmp(argv[2], "promiscuous")) {
+		if (strcmp(argv[2], "p") == 0) {
 			int promiscuous = 0; // default to off
 			if (strcmp(argv[3], "on") == 0) {
 				promiscuous = 1;
