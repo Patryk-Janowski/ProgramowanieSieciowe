@@ -166,8 +166,6 @@ int main(int argc, char* argv[]){
 	if( argc == 2 ){	
 		idx = _if_nametoindex(argv[1]);
 
-		set_promiscuous_mode(argv[1], 0);
-
 		if( idx != -1 )
 			printf("Index of interface %s = %u (%u)\n", argv[1], idx, if_nametoindex(argv[1]));
 		else
@@ -180,8 +178,25 @@ int main(int argc, char* argv[]){
 	if( argc == 3 )
 		if( set_mac_addr( argv[1], argv[2] ) < 0 )
 			printf("set_mac_addr error: %s \n", strerror ( errno ) );;
-	
-	if( argc > 3 )
+
+    if (argc == 4) {
+		if (strcmp(argv[2], "p")) {
+			int promiscuous = 0; // default to off
+			if (strcmp(argv[3], "on") == 0) {
+				promiscuous = 1;
+				printf("Promiscuous mode: ON\n");
+			} else if (strcmp(argv[3], "off") == 0) {
+				promiscuous = 0;
+				printf("Promiscuous mode: OFF\n");
+			} else {
+				printf("Invalid argument for promiscuous mode: %s\n", argv[2]);
+				exit(EXIT_FAILURE);
+			}
+    } else 
+		printf("Unsupported operation \n");
+	}
+
+	if( argc > 4 )
 		printf("Unsupported operation \n");
 	
     return 0;
